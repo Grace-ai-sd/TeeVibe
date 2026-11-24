@@ -1,3 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeeVibe | Personaliza tu camisa</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --azul-oscuro: #0D2E78;
+    --azul: #3568C8;
+    --azul-claro: #6794F4;
+    --rosa: #F45F91;
+    --rosa-claro: #FCE5EF;
+    --morado: #C97AE8;
+    --fondo: #F4F6FF;
+    --blanco: #FFFFFF;
+    --texto: #202A44;
+    --borde: #E0E5F3;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--texto);
+    background: var(--fondo);
+    min-height: 100vh;
+}
+
+button, input, textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+}
+
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--morado);
+    outline-offset: 3px;
+}
+
+.pantalla {
+    display: none;
+    min-height: 100vh;
+}
+
+.pantalla.activa {
+    display: block;
+}
+
+header {
+    width: 100%;
+    background: white;
+    padding: 17px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    box-shadow: 0 3px 15px #0D2E7810;
+    position: relative;
+    z-index: 2;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--azul-oscuro);
+    font-size: 25px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.logo-circulo {
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+}
+
+.logo span:last-child {
+    color: var(--rosa);
+}
+
+.navegacion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn-nav {
+    background: transparent;
+    color: var(--azul-oscuro);
+    padding: 10px 15px;
+    border-radius: 22px;
+    font-weight: 600;
+}
+
+.btn-nav:hover {
+    background: var(--rosa-claro);
+}
+
+.contenedor {
+    width: min(1200px, 92%);
+    margin: auto;
+}
+
+.boton {
+    padding: 13px 23px;
+    border-radius: 28px;
+    font-weight: 700;
+    transition: transform .2s, opacity .2s;
+}
+
+.boton:hover {
+    transform: translateY(-2px);
+}
+
+.boton-principal {
+    color: white;
+    background: linear-gradient(110deg, var(--azul), var(--morado));
+    box-shadow: 0 7px 18px #3568C833;
+}
+
+.boton-rosa {
+    color: white;
+    background: var(--rosa);
+}
+
+.boton-secundario {
+    background: white;
+    color: var(--azul-oscuro);
+    border: 1px solid var(--borde);
+}
+
+.titulo-seccion {
+    color: var(--azul-oscuro);
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.descripcion {
+    color: #69738D;
+    line-height: 1.8;
+}
+
+.etiqueta {
+    display: inline-block;
+    padding: 7px 14px;
+    border-radius: 20px;
+    color: var(--azul-oscuro);
+    background: #E4ECFF;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+/* INICIO */
+
+.hero {
+    margin: 32px auto;
+    width: min(1200px, 92%);
+    min-height: 430px;
+    border-radius: 30px;
+    padding: 45px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 30px;
+    background: linear-gradient(125deg, #FCE5EF, #E8E9FF 75%, #DDEBFF);
+    overflow: hidden;
+}
+
+.hero h1 {
+    font-size: clamp(34px, 5vw, 55px);
+    line-height: 1.16;
+    color: var(--azul-oscuro);
+    margin-bottom: 18px;
+}
+
+.hero h1 span {
+    color: var(--rosa);
+}
+
+.hero p {
+    line-height: 1.8;
+    margin-bottom: 25px;
+    max-width: 500px;
+}
+
+.hero-imagen {
+    width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    border-radius: 20px;
+}
+
+.seccion-productos {
+    padding: 15px 0 55px;
+}
+
+.encabezado-productos {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.busqueda {
+    padding: 12px 17px;
+    border: 1px solid var(--borde);
+    border-radius: 25px;
+    width: min(280px, 100%);
+    background: white;
+}
+
+.carrusel {
+    display: grid;
+    grid-template-columns: 45px 1fr 45px;
+    align-items: center;
+    gap: 12px;
+}
+
+.flecha {
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+    background: white;
+    color: var(--azul-oscuro);
+    border: 1px solid var(--borde);
+    font-size: 22px;
+}
+
+.lista-camisas {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    overflow: hidden;
+}
+
+.tarjeta {
+    background: white;
+    padding: 13px;
+    border-radius: 20px;
+    border: 1px solid var(--borde);
+    min-width: 0;
+}
+
+.tarjeta img {
+    width: 100%;
+    height: 190px;
+    object-fit: contain;
+    border-radius: 13px;
+    background: #F7F8FC;
+}
+
+.tarjeta h3 {
+    margin: 12px 0 5px;
+    color: var(--azul-oscuro);
+    font-size: 15px;
+}
+
+.tarjeta p {
+    color: #69738D;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.tarjeta .boton {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+}
+
+.sin-resultados {
+    display: none;
+    padding: 20px;
+    text-align: center;
+    color: #69738D;
+}
+
+footer {
+    background: var(--azul-oscuro);
+    color: white;
+    padding: 35px 5%;
+    margin-top: 35px;
+}
+
+.footer-contenido {
+    width: min(1200px, 100%);
+    margin: auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 25px;
+}
+
+footer h3 {
+    margin-bottom: 10px;
+}
+
+footer p, footer button {
+    color: #E0E8FF;
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+footer button {
+    background: transparent;
+    display: block;
+    text-align: left;
+}
+
+/* PERSONALIZADOR */
+
+.encabezado-pagina {
+    padding: 35px 0 20px;
+    text-align: center;
+}
+
+.personalizador {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 25px;
+    padding-bottom: 50px;
+    align-items: start;
+}
+
+.tarjeta-panel {
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 23px;
+    padding: 25px;
+    box-shadow: 0 7px 24px #0D2E7809;
+    min-width: 0;
+}
+
+.tarjeta-panel h2 {
+    color: var(--azul-oscuro);
+    font-size: 20px;
+    margin-bottom: 16px;
+}
+
+.area-camisa {
+    min-height: 370px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, #FCE5EF, #E8E9FF);
+    border-radius: 18px;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.vista-camisa {
+    position: relative;
+    width: min(100%, 310px);
+    aspect-ratio: 420 / 440;
+}
+
+.vista-camisa svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 10px 8px #18244D22);
+}
+
+.zona-diseno {
+    position: absolute;
+    left: 32%;
+    top: 28%;
+    width: 36%;
+    height: 34%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.zona-diseno img {
+    max-width: 95%;
+    max-height: 75%;
+    object-fit: contain;
+    display: none;
+}
+
+.zona-diseno span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    color: #222;
+}
+
+.vistas {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 17px;
+}
+
+.vista-btn {
+    border: 1px solid var(--borde);
+    background: white;
+    color: var(--azul-oscuro);
+    border-radius: 20px;
+    padding: 9px 18px;
+    font-weight: 600;
+}
+
+.vista-btn.activo {
+    background: var(--azul);
+    color: white;
+}
+
+.grupo-control {
+    margin-bottom: 24px;
+}
+
+.grupo-control label, .grupo-control h3 {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+    margin-bottom: 10px;
+}
+
+.colores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 11px;
+}
+
+.color {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid #D8DCE7;
+    position: relative;
+}
+
+.color.activo {
+    outline: 3px solid var(--azul);
+    outline-offset: 3px;
+}
+
+.color[data-color="#FFFFFF"] {
+    border: 1px solid #BEC5D5;
+}
+
+.tallas {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.talla {
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    background: #F3F5FC;
+    color: var(--azul-oscuro);
+    border: 1px solid var(--borde);
+    font-weight: 700;
+}
+
+.talla.activo {
+    color: white;
+    background: var(--azul);
+}
+
+.campo {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    background: white;
+    margin-bottom: 9px;
+    color: var(--texto);
+}
+
+input[type="file"] {
+    font-size: 13px;
+}
+
+.contador {
+    text-align: right;
+    font-size: 12px;
+    color: #7B849B;
+}
+
+.botones-fila {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.botones-fila .boton {
+    flex: 1;
+}
+
+/* PEDIDO */
+
+.pasos {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 15px 0 0;
+}
+
+.paso {
+    background: #E5E9F7;
+    color: #67718A;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.paso.activo {
+    background: var(--azul);
+    color: white;
+}
+
+.pedido-grid {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 25px;
+    padding: 25px 0 55px;
+    align-items: start;
+}
+
+.producto-pedido {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 18px;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.imagen-pedido {
+    height: 145px;
+    background: linear-gradient(145deg, #FCE5EF, #E8E9FF);
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    padding: 10px;
+}
+
+.imagen-pedido svg {
+    width: 100%;
+    height: 100%;
+}
+
+.detalle-pedido h3 {
+    color: var(--azul-oscuro);
+    margin-bottom: 7px;
+}
+
+.detalle-pedido p {
+    font-size: 13px;
+    color: #69738D;
+    margin: 4px 0;
+    overflow-wrap: anywhere;
+}
+
+.detalle-pedido strong {
+    color: var(--azul-oscuro);
+}
+
+.fila-precio {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+.total {
+    border-top: 1px solid var(--borde);
+    margin-top: 8px;
+    padding-top: 17px;
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--azul-oscuro);
+}
+
+.nota {
+    color: #778098;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 12px 0 18px;
+}
+
+.confirmacion {
+    display: none;
+    text-align: center;
+    padding: 35px 20px;
+}
+
+.confirmacion.visible {
+    display: block;
+}
+
+.icono-confirmacion {
+    width: 75px;
+    height: 75px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 20px;
+    background: #DDF8E9;
+    color: #15804B;
+    border-radius: 50%;
+    font-size: 38px;
+}
+
+.localizacion-confirmacion {
+    max-width: 850px;
+    margin: 28px auto 8px;
+    padding: 22px;
+    background: #F7F8FC;
+    border: 1px solid var(--borde);
+    border-radius: 20px;
+    text-align: left;
+}
+.localizacion-confirmacion h2 {
+    color: var(--azul-oscuro);
+    font-size: 21px;
+    margin-bottom: 8px;
+}
+.localizacion-confirmacion p {
+    color: #69738D;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    margin-bottom: 15px;
+}
+.mapa-interactivo-envio { width: 100%; height: 300px; border-radius: 14px; margin: 12px 0; z-index: 1; background: #E8E9FF; }
+.mensaje-geolocalizacion { font-size: 12px; color: #69738D; margin: 8px 0 14px; line-height: 1.6; }
+.mapa-envio {
+    display: block;
+    width: 100%;
+    height: 320px;
+    border: 0;
+    border-radius: 14px;
+    background: #E8E9FF;
+}
+@media (max-width: 520px) {
+    .localizacion-confirmacion {
+        padding: 14px;
+    }
+    .mapa-interactivo-envio { width: 100%; height: 300px; border-radius: 14px; margin: 12px 0; z-index: 1; background: #E8E9FF; }
+.mensaje-geolocalizacion { font-size: 12px; color: #69738D; margin: 8px 0 14px; line-height: 1.6; }
+.mapa-envio {
+        height: 250px;
+    }
+}
+
+.mensaje-error {
+    display: none;
+    background: #FFF0F2;
+    color: #A1263D;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    margin: 12px 0;
+}
+
+@media (max-width: 850px) {
+    .hero, .personalizador, .pedido-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 30px;
+    }
+
+    .hero-imagen {
+        max-height: 280px;
+    }
+
+    .lista-camisas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .footer-contenido {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    header {
+        padding: 13px 4%;
+        flex-wrap: wrap;
+    }
+
+    .logo {
+        font-size: 21px;
+    }
+
+    .navegacion {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-nav {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .hero {
+        padding: 25px 20px;
+    }
+
+    .carrusel {
+        grid-template-columns: 32px 1fr 32px;
+        gap: 5px;
+    }
+
+    .flecha {
+        width: 32px;
+        height: 38px;
+    }
+
+    .lista-camisas {
+        gap: 9px;
+    }
+
+    .tarjeta {
+        padding: 8px;
+    }
+
+    .tarjeta img {
+        height: 125px;
+    }
+
+    .tarjeta h3 {
+        font-size: 12px;
+    }
+
+    .tarjeta p {
+        font-size: 11px;
+    }
+
+    .tarjeta .boton {
+        font-size: 11px;
+    }
+
+    .tarjeta-panel {
+        padding: 17px;
+    }
+
+    .producto-pedido {
+        grid-template-columns: 100px 1fr;
+        gap: 12px;
+    }
+
+    .imagen-pedido {
+        height: 115px;
+    }
+
+    .footer-contenido {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
 <!-- ==================== PESTAÑA 1: INICIO ==================== -->
 <section id="pantallaInicio" class="pantalla activa">
 
@@ -28,7 +819,7 @@
                 </button>
             </div>
 
-            <img class="hero-imagen" src="CAMISA1.jpg"
+            <img class="hero-imagen" src="camisa1.jpg"
                  alt="Inspiración de camisas personalizadas">
         </section>
 
@@ -48,9 +839,8 @@
                 <button class="flecha" id="anterior" aria-label="Diseños anteriores">‹</button>
 
                 <div class="lista-camisas" id="listaCamisas">
-
                     <article class="tarjeta" data-nombre="Diseño 1">
-                        <img src="CAMISA1.png" alt="Diseño de camisa 1">
+                        <img src="camisa1.jpg" alt="Diseño de camisa 1">
                     </article>
 
                     <article class="tarjeta" data-nombre="Diseño 2">
@@ -80,7 +870,6 @@
                     <article class="tarjeta" data-nombre="Diseño 8">
                         <img src="camisa8.jpg" alt="Diseño de camisa 8">
                     </article>
-
                 </div>
 
                 <button class="flecha" id="siguiente" aria-label="Más diseños">›</button>
@@ -109,3 +898,694 @@
         </div>
     </footer>
 </section>
+
+
+<!-- ==================== PESTAÑA 2: PERSONALIZAR ==================== -->
+<section id="pantallaPersonalizar" class="pantalla">
+
+    <header>
+        <div class="logo" data-ir="pantallaInicio" role="button" tabindex="0">
+            <span class="logo-circulo">V</span>
+            Tee<span>Vibe</span>
+        </div>
+
+        <nav class="navegacion">
+            <button class="btn-nav" data-ir="pantallaInicio">← Inicio</button>
+            <button class="btn-nav" data-ir="pantallaPersonalizar">Personalizar</button>
+            <button class="btn-nav" data-ir="pantallaPedido">Envío</button>
+        </nav>
+    </header>
+
+    <div class="contenedor">
+        <div class="encabezado-pagina">
+            <span class="etiqueta">PASO 2 DE 3</span>
+            <h1 class="titulo-seccion">Personaliza tu camisa</h1>
+            <p class="descripcion">Elige tu color, talla y agrega tu propio diseño.</p>
+
+            <div class="pasos">
+                <span class="paso">1. Inicio</span>
+                <span class="paso activo">2. Personalización</span>
+                <span class="paso">3. Envío</span>
+            </div>
+        </div>
+
+        <div class="personalizador">
+
+            <div class="tarjeta-panel">
+                <h2>Vista previa de tu camisa</h2>
+
+                <div class="area-camisa">
+                    <div class="vista-camisa">
+                        <svg viewBox="0 0 420 440" aria-label="Vista previa de camiseta">
+                            <path id="camisaBase"
+                                d="M133 42 L91 59 L30 122 L77 179 L116 148 L116 396 Q210 414 304 396 L304 148 L343 179 L390 122 L329 59 L287 42 Q268 77 210 77 Q152 77 133 42 Z"
+                                fill="#FFFFFF" stroke="#D0D3DF" stroke-width="3"
+                                stroke-linejoin="round"/>
+                            <path d="M152 47 Q210 106 268 47"
+                                fill="none" stroke="#D0D3DF" stroke-width="3"/>
+                        </svg>
+
+                        <div class="zona-diseno">
+                            <img id="imagenDiseno" alt="Tu diseño">
+                            <span id="textoDiseno"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vistas">
+                    <button class="vista-btn activo" id="frente">Frente</button>
+                    <button class="vista-btn" id="atras">Parte trasera</button>
+                </div>
+
+                <p class="descripcion" style="text-align:center;margin-top:12px;font-size:13px;">
+                    Vista: <strong id="vistaActual">Frente</strong>
+                </p>
+            </div>
+
+            <div class="tarjeta-panel">
+                <h2>Tu diseño</h2>
+
+                <div class="grupo-control">
+                    <h3>1. Elige el color</h3>
+                    <div class="colores">
+                        <button class="color activo" data-color="#FFFFFF" data-nombre="Blanco" style="background:#FFFFFF" aria-label="Blanco" title="Blanco"></button>
+                        <button class="color" data-color="#000000" data-nombre="Negro" style="background:#000000" aria-label="Negro" title="Negro"></button>
+                        <button class="color" data-color="#3568C8" data-nombre="Azul" style="background:#3568C8" aria-label="Azul" title="Azul"></button>
+                        <button class="color" data-color="#F45F91" data-nombre="Rosa" style="background:#F45F91" aria-label="Rosa" title="Rosa"></button>
+                        <button class="color" data-color="#C97AE8" data-nombre="Morado" style="background:#C97AE8" aria-label="Morado" title="Morado"></button>
+                        <button class="color" data-color="#6794F4" data-nombre="Azul claro" style="background:#6794F4" aria-label="Azul claro" title="Azul claro"></button>
+                        <button class="color" data-color="#FFD95A" data-nombre="Amarillo" style="background:#FFD95A" aria-label="Amarillo" title="Amarillo"></button>
+                        <button class="color" data-color="#16B978" data-nombre="Verde" style="background:#16B978" aria-label="Verde" title="Verde"></button>
+                        <button class="color" data-color="#FF5722" data-nombre="Naranja" style="background:#FF5722" aria-label="Naranja" title="Naranja"></button>
+                        <button class="color" data-color="#E73546" data-nombre="Rojo" style="background:#E73546" aria-label="Rojo" title="Rojo"></button>
+                    </div>
+                    <p class="descripcion" style="margin-top:10px;font-size:13px;">
+                        Color elegido: <strong id="nombreColor">Blanco</strong>
+                    </p>
+                </div>
+
+                <div class="grupo-control">
+                    <h3>2. Elige la talla</h3>
+                    <div class="tallas">
+                        <button class="talla" data-talla="XS">XS</button>
+                        <button class="talla" data-talla="S">S</button>
+                        <button class="talla activo" data-talla="M">M</button>
+                        <button class="talla" data-talla="L">L</button>
+                        <button class="talla" data-talla="XL">XL</button>
+                    </div>
+                    <p class="descripcion" style="margin-top:10px;font-size:13px;">
+                        Talla elegida: <strong id="tallaActual">M</strong>
+                    </p>
+                </div>
+
+                <div class="grupo-control">
+                    <h3>3. Sube tu imagen</h3>
+                    <input class="campo" type="file" id="archivo" accept="image/*">
+                    <button class="boton boton-secundario" id="eliminarImagen" type="button">
+                        Eliminar imagen
+                    </button>
+                </div>
+
+                <div class="grupo-control">
+                    <label for="texto">4. Agrega una frase (opcional)</label>
+                    <input class="campo" id="texto" type="text" maxlength="30"
+                           placeholder="Escribe tu frase aquí">
+                    <p class="contador"><span id="contador">0</span>/30 caracteres</p>
+                </div>
+
+                <div class="botones-fila">
+                    <button class="boton boton-secundario" data-ir="pantallaInicio">← Volver</button>
+                    <button class="boton boton-principal" id="enviar">Guardar y continuar →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== PESTAÑA 3: ENVÍO Y RESUMEN ==================== -->
+<section id="pantallaPedido" class="pantalla">
+
+    <header>
+        <div class="logo" data-ir="pantallaInicio" role="button" tabindex="0">
+            <span class="logo-circulo">V</span>
+            Tee<span>Vibe</span>
+        </div>
+
+        <nav class="navegacion">
+            <button class="btn-nav" data-ir="pantallaInicio">Inicio</button>
+            <button class="btn-nav" data-ir="pantallaPersonalizar">← Personalizar</button>
+            <button class="btn-nav" data-ir="pantallaPedido">Envío</button>
+        </nav>
+    </header>
+
+    <div class="contenedor">
+        <div class="encabezado-pagina" id="encabezadoPedido">
+            <span class="etiqueta">PASO 3 DE 3</span>
+            <h1 class="titulo-seccion">Resumen de tu pedido</h1>
+            <p class="descripcion">Revisa tu diseño y completa tus datos de envío.</p>
+
+            <div class="pasos">
+                <span class="paso">1. Inicio</span>
+                <span class="paso">2. Personalización</span>
+                <span class="paso activo">3. Envío</span>
+            </div>
+        </div>
+
+        <div class="pedido-grid" id="resumenPedido">
+
+            <div class="tarjeta-panel">
+                <h2>Tu camisa personalizada</h2>
+
+                <div class="producto-pedido">
+                    <div class="imagen-pedido">
+                        <svg viewBox="0 0 420 440" aria-label="Vista previa del pedido">
+                            <path id="camisaPedido"
+                                d="M133 42 L91 59 L30 122 L77 179 L116 148 L116 396 Q210 414 304 396 L304 148 L343 179 L390 122 L329 59 L287 42 Q268 77 210 77 Q152 77 133 42 Z"
+                                fill="#FFFFFF" stroke="#D0D3DF" stroke-width="3"
+                                stroke-linejoin="round"/>
+                            <path d="M152 47 Q210 106 268 47"
+                                fill="none" stroke="#D0D3DF" stroke-width="3"/>
+                            <image id="imagenPedido" x="135" y="125" width="150" height="145"
+                                   preserveAspectRatio="xMidYMid meet" style="display:none"/>
+                            <text id="textoPedido" x="210" y="300" text-anchor="middle"
+                                  font-size="18" font-weight="bold" fill="#222"></text>
+                        </svg>
+                    </div>
+
+                    <div class="detalle-pedido">
+                        <h3 id="nombreProducto">Camisa personalizada</h3>
+                        <p>Talla: <strong id="talla">M</strong></p>
+                        <p>Color: <strong id="color">Blanco</strong></p>
+                        <p>Diseño: <strong id="detalleDiseno">Sin diseño adicional</strong></p>
+                        <p>Precio: <strong>$250.00 MXN</strong></p>
+                    </div>
+                </div>
+
+                <h2 style="margin-top:25px;">Datos de envío</h2>
+                <p class="descripcion" style="font-size:13px;margin-bottom:15px;">
+                    Completa los siguientes campos para continuar.
+                </p>
+
+                <form id="formEnvio">
+                    <label class="descripcion" style="display:block;font-size:13px;">Ubicación de entrega</label>
+                    <div id="mapaEntrega" class="mapa-interactivo-envio" role="application" aria-label="Mapa interactivo para seleccionar la ubicación de entrega"></div>
+                    <div class="botones-fila">
+                        <button class="boton boton-secundario" type="button" id="usarMiUbicacion">◎ Usar mi ubicación</button>
+                    </div>
+                    <p class="mensaje-geolocalizacion" id="estadoGeolocalizacion">Puedes permitir el acceso a tu ubicación o seleccionar un punto directamente en el mapa.</p>
+                    <label for="nombreCliente" class="descripcion" style="display:block;font-size:13px;">Nombre completo</label>
+                    <input class="campo" id="nombreCliente" name="nombreCliente"
+                           type="text" placeholder="Tu nombre completo" required>
+
+                    <label for="telefono" class="descripcion" style="display:block;font-size:13px;">Teléfono</label>
+                    <input class="campo" id="telefono" name="telefono"
+                           type="tel" placeholder="Tu número de teléfono"
+                           pattern="[0-9 +()-]{10,18}" required>
+
+                    <label for="direccion" class="descripcion" style="display:block;font-size:13px;">Dirección</label>
+                    <input class="campo" id="direccion" name="direccion"
+                           type="text" placeholder="Calle, número y colonia" required>
+
+                    <label for="ciudad" class="descripcion" style="display:block;font-size:13px;">Ciudad y estado</label>
+                    <input class="campo" id="ciudad" name="ciudad"
+                           type="text" placeholder="Ciudad, estado" required>
+
+                    <label for="codigoPostal" class="descripcion" style="display:block;font-size:13px;">Código postal</label>
+                    <input class="campo" id="codigoPostal" name="codigoPostal"
+                           type="text" inputmode="numeric" pattern="[0-9]{5}"
+                           maxlength="5" placeholder="5 dígitos" required>
+
+                    <p class="nota">El costo y la fecha de entrega se confirmarían al procesar el pedido.</p>
+
+                    <div class="mensaje-error" id="mensajeError"></div>
+
+                    <div class="botones-fila">
+                        <button class="boton boton-secundario" type="button" data-ir="pantallaPersonalizar">
+                            ← Editar diseño
+                        </button>
+                        <button class="boton boton-principal" type="submit" id="enviarPedido">
+                            Confirmar pedido
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tarjeta-panel">
+                <h2>Detalle del pago</h2>
+
+                <div class="fila-precio">
+                    <span>Camisa personalizada</span>
+                    <span id="precioUnitario">$250.00</span>
+                </div>
+
+                <div class="fila-precio">
+                    <span>Cantidad</span>
+                    <span id="cantidadTexto">1</span>
+                </div>
+
+                <div class="fila-precio">
+                    <span>Subtotal</span>
+                    <span id="subtotal">$250.00</span>
+                </div>
+
+                <div class="fila-precio">
+                    <span>Envío</span>
+                    <span>Por confirmar</span>
+                </div>
+
+                <div class="fila-precio total">
+                    <span>Total parcial</span>
+                    <span id="total">$250.00 MXN</span>
+                </div>
+
+                <p class="nota">
+                    Este es un resumen demostrativo. El envío no está incluido en el precio
+                    y esta página no procesa pagos reales.
+                </p>
+
+                <button class="boton boton-secundario" style="width:100%;"
+                        data-ir="pantallaInicio">
+                    Seguir explorando
+                </button>
+            </div>
+        </div>
+
+        <div class="tarjeta-panel confirmacion" id="confirmacion">
+            <div class="icono-confirmacion">✓</div>
+            <h1 class="titulo-seccion">¡Pedido registrado!</h1>
+            <p class="descripcion" style="margin:12px auto;max-width:500px;">
+                Tu pedido se registró en esta demostración. No se ha realizado ningún pago
+                ni se ha enviado información a una tienda.
+            </p>
+            <p id="mensajeConfirmacion" style="margin:15px 0;"></p>
+
+            <div class="localizacion-confirmacion">
+                <h2>📍 Localización de entrega</h2>
+                <p id="direccionConfirmada">Aquí aparecerá la dirección que registraste para tu pedido.</p>
+                <iframe
+                    id="mapaConfirmacion"
+                    class="mapa-envio"
+                    title="Mapa de localización de entrega"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    src="https://maps.google.com/maps?q=Mexico&output=embed">
+                </iframe>
+                <p style="font-size:12px;margin:12px 0 0;">
+                    La ubicación del mapa es orientativa y depende de la dirección ingresada.
+                </p>
+            </div>
+
+            <button class="boton boton-principal" id="volverInicio">Volver al inicio</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-contenido">
+            <div>
+                <h3>TeeVibe</h3>
+                <p>Tu creatividad, tu estilo y tu propia camisa.</p>
+            </div>
+            <div>
+                <h3>Contacto</h3>
+                <p>Gracias por diseñar con TeeVibe.</p>
+            </div>
+            <div>
+                <h3>Explora</h3>
+                <button data-ir="pantallaInicio">Inicio</button>
+                <button data-ir="pantallaPersonalizar">Personalizar</button>
+            </div>
+        </div>
+    </footer>
+</section>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* NAVEGACIÓN ENTRE LAS TRES PESTAÑAS */
+    const pantallas = document.querySelectorAll(".pantalla");
+
+    function irAPantalla(id) {
+        const destino = document.getElementById(id);
+        if (!destino) return;
+
+        pantallas.forEach(function (pantalla) {
+            pantalla.classList.remove("activa");
+        });
+
+        destino.classList.add("activa");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        if (id === "pantallaPedido") {
+            actualizarResumen();
+        }
+    }
+
+    document.querySelectorAll("[data-ir]").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            irAPantalla(boton.dataset.ir);
+        });
+
+        if (boton.getAttribute("role") === "button") {
+            boton.addEventListener("keydown", function (evento) {
+                if (evento.key === "Enter" || evento.key === " ") {
+                    evento.preventDefault();
+                    irAPantalla(boton.dataset.ir);
+                }
+            });
+        }
+    });
+
+
+    /* DATOS DE LA PERSONALIZACIÓN */
+    const datos = {
+        color: "#FFFFFF",
+        nombreColor: "Blanco",
+        talla: "M",
+        texto: "",
+        imagen: "",
+        vista: "Frente"
+    };
+
+    const camisaBase = document.getElementById("camisaBase");
+    const texto = document.getElementById("texto");
+    const textoDiseno = document.getElementById("textoDiseno");
+    const imagenDiseno = document.getElementById("imagenDiseno");
+    const archivo = document.getElementById("archivo");
+    const contador = document.getElementById("contador");
+
+
+    /* CAMBIAR COLOR */
+    document.querySelectorAll(".color").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            datos.color = boton.dataset.color;
+            datos.nombreColor = boton.dataset.nombre;
+
+            camisaBase.setAttribute("fill", datos.color);
+
+            document.querySelectorAll(".color").forEach(function (otro) {
+                otro.classList.remove("activo");
+            });
+
+            boton.classList.add("activo");
+            document.getElementById("nombreColor").textContent = datos.nombreColor;
+        });
+    });
+
+
+    /* CAMBIAR TALLA */
+    document.querySelectorAll(".talla").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            datos.talla = boton.dataset.talla;
+
+            document.querySelectorAll(".talla").forEach(function (otro) {
+                otro.classList.remove("activo");
+            });
+
+            boton.classList.add("activo");
+            document.getElementById("tallaActual").textContent = datos.talla;
+        });
+    });
+
+
+    /* SUBIR IMAGEN */
+    archivo.addEventListener("change", function () {
+        const file = archivo.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Selecciona un archivo de imagen válido.");
+            archivo.value = "";
+            return;
+        }
+
+        const lector = new FileReader();
+
+        lector.onload = function (evento) {
+            datos.imagen = evento.target.result;
+            imagenDiseno.src = datos.imagen;
+            imagenDiseno.style.display = "block";
+            actualizarResumen();
+        };
+
+        lector.readAsDataURL(file);
+    });
+
+
+    /* ELIMINAR IMAGEN */
+    document.getElementById("eliminarImagen").addEventListener("click", function () {
+        datos.imagen = "";
+        archivo.value = "";
+        imagenDiseno.removeAttribute("src");
+        imagenDiseno.style.display = "none";
+        actualizarResumen();
+    });
+
+
+    /* ESCRIBIR TEXTO */
+    texto.addEventListener("input", function () {
+        datos.texto = texto.value;
+        textoDiseno.textContent = datos.texto;
+        contador.textContent = texto.value.length;
+        actualizarResumen();
+    });
+
+
+    /* CAMBIAR VISTA FRONTAL / TRASERA */
+    document.getElementById("frente").addEventListener("click", function () {
+        datos.vista = "Frente";
+        actualizarVista();
+    });
+
+    document.getElementById("atras").addEventListener("click", function () {
+        datos.vista = "Parte trasera";
+        actualizarVista();
+    });
+
+    function actualizarVista() {
+        document.getElementById("vistaActual").textContent = datos.vista;
+
+        document.getElementById("frente").classList.toggle(
+            "activo", datos.vista === "Frente"
+        );
+
+        document.getElementById("atras").classList.toggle(
+            "activo", datos.vista === "Parte trasera"
+        );
+
+        /*
+          Es una vista previa sencilla. El mismo diseño se muestra en ambos lados.
+          Para un sistema de impresión real, cada lado necesitaría su propio diseño.
+        */
+    }
+
+
+    /* GUARDAR Y PASAR A LA PESTAÑA DE ENVÍO */
+    document.getElementById("enviar").addEventListener("click", function () {
+        try {
+            sessionStorage.setItem("teeVibePersonalizacion", JSON.stringify(datos));
+        } catch (error) {
+            console.warn("No fue posible guardar la personalización en el navegador.");
+        }
+
+        actualizarResumen();
+        irAPantalla("pantallaPedido");
+    });
+
+
+    /* ACTUALIZAR EL RESUMEN DEL PEDIDO */
+    function actualizarResumen() {
+        document.getElementById("camisaPedido").setAttribute("fill", datos.color);
+        document.getElementById("talla").textContent = datos.talla;
+        document.getElementById("color").textContent = datos.nombreColor;
+
+        const textoPedido = document.getElementById("textoPedido");
+        textoPedido.textContent = datos.texto;
+
+        const imagenPedido = document.getElementById("imagenPedido");
+
+        if (datos.imagen) {
+            imagenPedido.setAttribute("href", datos.imagen);
+            imagenPedido.setAttributeNS(
+                "http://www.w3.org/1999/xlink", "xlink:href", datos.imagen
+            );
+            imagenPedido.style.display = "block";
+        } else {
+            imagenPedido.removeAttribute("href");
+            imagenPedido.removeAttributeNS("http://www.w3.org/1999/xlink", "href");
+            imagenPedido.style.display = "none";
+        }
+
+        let detalle = "Sin diseño adicional";
+        if (datos.imagen && datos.texto) {
+            detalle = "Imagen y texto";
+        } else if (datos.imagen) {
+            detalle = "Imagen personalizada";
+        } else if (datos.texto) {
+            detalle = "Texto personalizado";
+        }
+
+        document.getElementById("detalleDiseno").textContent = detalle;
+
+        const precio = 250;
+        document.getElementById("precioUnitario").textContent =
+            precio.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+
+        document.getElementById("subtotal").textContent =
+            precio.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+
+        document.getElementById("total").textContent =
+            precio.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+
+        document.getElementById("cantidadTexto").textContent = "1";
+    }
+
+
+    /* CARRUSEL: MOVER LOS DISEÑOS */
+    const listaCamisas = document.getElementById("listaCamisas");
+    const anterior = document.getElementById("anterior");
+    const siguiente = document.getElementById("siguiente");
+
+    siguiente.addEventListener("click", function () {
+        listaCamisas.scrollBy({
+            left: listaCamisas.clientWidth * 0.8,
+            behavior: "smooth"
+        });
+    });
+
+    anterior.addEventListener("click", function () {
+        listaCamisas.scrollBy({
+            left: -listaCamisas.clientWidth * 0.8,
+            behavior: "smooth"
+        });
+    });
+
+
+    /* BUSCAR DISEÑOS */
+    const busqueda = document.getElementById("busqueda");
+    const tarjetas = document.querySelectorAll(".tarjeta");
+    const sinResultados = document.getElementById("sinResultados");
+
+    busqueda.addEventListener("input", function () {
+        const termino = busqueda.value.toLowerCase().trim();
+        let visibles = 0;
+
+        tarjetas.forEach(function (tarjeta) {
+            const coincide = tarjeta.textContent.toLowerCase().includes(termino)
+                || tarjeta.dataset.nombre.toLowerCase().includes(termino);
+
+            tarjeta.style.display = coincide ? "" : "none";
+
+            if (coincide) visibles++;
+        });
+
+        sinResultados.style.display = visibles === 0 ? "block" : "none";
+    });
+
+
+    /* MAPA INTERACTIVO Y GEOLOCALIZACIÓN PARA LA ENTREGA */
+    const estadoGeo = document.getElementById("estadoGeolocalizacion");
+    let coordenadasEntrega = null;
+    let marcadorEntrega = null;
+    let mapaEntrega = null;
+    const vistaInicial = [23.6345, -102.5528];
+
+    if (typeof L !== "undefined" && document.getElementById("mapaEntrega")) {
+        mapaEntrega = L.map("mapaEntrega").setView(vistaInicial, 5);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(mapaEntrega);
+
+        function elegirPunto(lat, lng) {
+            coordenadasEntrega = { lat: lat, lng: lng };
+            if (marcadorEntrega) mapaEntrega.removeLayer(marcadorEntrega);
+            marcadorEntrega = L.marker([lat, lng]).addTo(mapaEntrega)
+                .bindPopup("Ubicación de entrega seleccionada").openPopup();
+            estadoGeo.textContent = "Ubicación seleccionada: " + lat.toFixed(6) + ", " + lng.toFixed(6) + ". Completa también los datos de dirección.";
+        }
+
+        mapaEntrega.on("click", function (evento) {
+            elegirPunto(evento.latlng.lat, evento.latlng.lng);
+        });
+
+        document.getElementById("usarMiUbicacion").addEventListener("click", function () {
+            if (!navigator.geolocation) {
+                estadoGeo.textContent = "Tu navegador no permite geolocalización. Selecciona un punto en el mapa.";
+                return;
+            }
+            estadoGeo.textContent = "Solicitando permiso para conocer tu ubicación...";
+            navigator.geolocation.getCurrentPosition(function (posicion) {
+                const lat = posicion.coords.latitude;
+                const lng = posicion.coords.longitude;
+                mapaEntrega.setView([lat, lng], 16);
+                elegirPunto(lat, lng);
+            }, function (error) {
+                const mensajes = {
+                    1: "No se concedió permiso para acceder a la ubicación.",
+                    2: "No fue posible determinar tu ubicación.",
+                    3: "La solicitud tardó demasiado. Intenta de nuevo."
+                };
+                estadoGeo.textContent = (mensajes[error.code] || "No se pudo obtener la ubicación.") + " También puedes hacer clic en el mapa.";
+            }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+        });
+    } else {
+        estadoGeo.textContent = "No se pudo cargar el mapa. Revisa tu conexión a internet.";
+    }
+
+    /* CONFIRMAR EL PEDIDO: DEMOSTRACIÓN, SIN PAGO REAL */
+    const formEnvio = document.getElementById("formEnvio");
+    const mensajeError = document.getElementById("mensajeError");
+
+    formEnvio.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        if (!formEnvio.checkValidity()) {
+            formEnvio.reportValidity();
+            return;
+        }
+
+        const nombre = document.getElementById("nombreCliente").value.trim();
+        const direccion = document.getElementById("direccion").value.trim();
+        const ciudad = document.getElementById("ciudad").value.trim();
+        const codigoPostal = document.getElementById("codigoPostal").value.trim();
+        const direccionCompleta = [direccion, ciudad, codigoPostal, "México"]
+            .filter(Boolean)
+            .join(", ");
+
+        document.getElementById("direccionConfirmada").textContent =
+            "Dirección registrada: " + direccionCompleta;
+
+        const destinoMapa = coordenadasEntrega
+            ? coordenadasEntrega.lat + "," + coordenadasEntrega.lng
+            : direccionCompleta;
+        document.getElementById("mapaConfirmacion").src =
+            "https://maps.google.com/maps?q=" + encodeURIComponent(destinoMapa) + "&output=embed";
+
+        document.getElementById("mensajeConfirmacion").textContent =
+            "Gracias, " + nombre + ". Tu pedido de prueba quedó registrado en esta página.";
+
+        document.getElementById("resumenPedido").style.display = "none";
+        document.getElementById("encabezadoPedido").style.display = "none";
+        document.getElementById("confirmacion").classList.add("visible");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+
+    /* VOLVER AL INICIO DESPUÉS DE LA CONFIRMACIÓN */
+    document.getElementById("volverInicio").addEventListener("click", function () {
+        document.getElementById("resumenPedido").style.display = "";
+        document.getElementById("encabezadoPedido").style.display = "";
+        document.getElementById("confirmacion").classList.remove("visible");
+        formEnvio.reset();
+        irAPantalla("pantallaInicio");
+    });
+
+});
+</script>
+
+</body>
+</html>
