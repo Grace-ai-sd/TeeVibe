@@ -1,0 +1,111 @@
+<!-- ==================== PESTAÑA 1: INICIO ==================== -->
+<section id="pantallaInicio" class="pantalla activa">
+
+    <header>
+        <div class="logo" data-ir="pantallaInicio" role="button" tabindex="0">
+            <span class="logo-circulo">V</span>
+            Tee<span>Vibe</span>
+        </div>
+
+        <nav class="navegacion">
+            <button class="btn-nav" data-ir="pantallaInicio">Inicio</button>
+            <button class="btn-nav" data-ir="pantallaPersonalizar">Personalizar</button>
+            <button class="btn-nav" data-ir="pantallaPedido">Envío</button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div>
+                <span class="etiqueta">TU ESTILO, TUS REGLAS</span>
+                <h1>Crea tu propia <span>camisa</span></h1>
+                <p>
+                    Dale vida a tus ideas. Personaliza tu camisa con tus colores,
+                    imágenes y frases favoritas. Diseña algo que hable de ti.
+                </p>
+                <button class="boton boton-principal" data-ir="pantallaPersonalizar">
+                    Personalizar ahora →
+                </button>
+            </div>
+
+            <img class="hero-imagen" src="CAMISA1.jpg"
+                 alt="Inspiración de camisas personalizadas">
+        </section>
+
+        <section class="seccion-productos contenedor">
+            <div class="encabezado-productos">
+                <div>
+                    <span class="etiqueta">INSPÍRATE</span>
+                    <h2 class="titulo-seccion">Diseños para ti</h2>
+                    <p class="descripcion">Explora ideas y crea una camisa a tu estilo.</p>
+                </div>
+
+                <input class="busqueda" id="busqueda"
+                       type="search" placeholder="Buscar diseño...">
+            </div>
+
+            <div class="carrusel">
+                <button class="flecha" id="anterior" aria-label="Diseños anteriores">‹</button>
+
+                <div class="lista-camisas" id="listaCamisas">
+
+                    <article class="tarjeta" data-nombre="Diseño 1">
+                        <img src="CAMISA1.png" alt="Diseño de camisa 1">
+                    </article>
+
+                    <article class="tarjeta" data-nombre="Diseño 2">
+                        <img src="camisa2.jpg" alt="Diseño de camisa 2">
+                    </article>
+
+                    <article class="tarjeta" data-nombre="Diseño 3">
+                        <img src="camisa3.jpg" alt="Diseño de camisa 3">
+                    </article>
+
+                    <article class="tarjeta" data-nombre="Diseño 4">
+                        <img src="camisa4.jpg" alt="Diseño de camisa 4">
+                    </article>
+
+                    <article class="tarjeta" data-nombre="Diseño 5">
+                        <img src="camisa5.jpg" alt="Diseño de camisa 5">
+                    </article>
+
+                    <article class="tarjeta" data-nombre="Diseño 6">
+                        <img src="camisa6.jpg" alt="Diseño de camisa 6">
+                    </article>
+
+                    <article class="tarjeta" data-nombre="Diseño 7">
+                        <img src="camisa7.jpg" alt="Diseño de camisa 7">
+                    </article>
+
+                    <article class="tarjeta" data-nombre="Diseño 8">
+                        <img src="camisa8.jpg" alt="Diseño de camisa 8">
+                    </article>
+
+                </div>
+
+                <button class="flecha" id="siguiente" aria-label="Más diseños">›</button>
+            </div>
+
+            <p class="sin-resultados" id="sinResultados">No se encontraron diseños.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-contenido">
+            <div>
+                <h3>TeeVibe</h3>
+                <p>Tu creatividad, tu estilo y tu propia camisa.</p>
+            </div>
+            <div>
+                <h3>Contacto</h3>
+                <p>Personaliza tu experiencia desde nuestra página.</p>
+            </div>
+            <div>
+                <h3>Explora</h3>
+                <button data-ir="pantallaInicio">Inicio</button>
+                <button data-ir="pantallaPersonalizar">Personalizar</button>
+                <button data-ir="pantallaPedido">Resumen de pedido</button>
+            </div>
+        </div>
+    </footer>
+</section>
